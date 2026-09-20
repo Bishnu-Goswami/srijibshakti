@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>শ্রীজীব শক্তি খেলা</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, sans-serif;
+            background: radial-gradient(circle at top, #9c27b0, #3f51b5); 
+            color: #fff;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; animation: zoomIn 0.3s ease; }
+
+        @keyframes zoomIn { 
+            0% { opacity: 0; transform: scale(0.9); } 
+            100% { opacity: 1; transform: scale(1); } 
+        }
+
+        .menu-image {
+            width: 180px;
+            max-width: 70%;
+            height: auto;
+            display: block;
+            margin: 10px auto 15px;
+            border-radius: 20px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            object-fit: cover;
+        }
+
+        .title-box {
+            background: linear-gradient(45deg, #ffeb3b, #ff9800);
+            padding: 20px;
+            border-radius: 15px;
+            border: 5px solid #fff;
+            margin-bottom: 20px;
+            color: #d32f2f;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+
+        .title-box h1 { margin: 0; font-size: 28px; text-shadow: 1px 1px 0px #fff; }
+        .title-box p { margin: 5px 0 0 0; font-weight: bold; color: #000; font-size: 13px;}
+        
+        .btn {
+            background: linear-gradient(to bottom, #4CAF50, #2E7D32);
+            color: white;
+            border: 3px solid #fff;
+            padding: 14px;
+            margin: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 50px;
+            width: 90%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+
+        .btn:active { transform: scale(0.95); }
+        .btn-mode { background: linear-gradient(to right, #ff416c, #ff4b2b); }
+        .btn-help { background: linear-gradient(to right, #00c6ff, #0072ff); }
+        .btn-music { background: linear-gradient(to right, #f7971e, #ffd200); color: #000; }
+        .btn-debug { background: linear-gradient(to right, #607d8b, #37474f); }
+
+        .btn-small { width: 45%; padding: 14px 10px; font-size: 18px; border-radius: 15px; margin: 0; }
+
+        .setup-box {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            border: 2px dashed #ffeb3b;
+        }
+
+        .setup-box label { display: block; margin-top: 10px; font-size: 16px; font-weight: bold;}
+        .setup-box input {
+            font-size: 18px;
+            padding: 6px;
+            width: 100%;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            border: 2px solid #fff;
+            text-align: center;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            color: #000;
+            padding: 10px 15px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .info-banner {
+            background-color: #ffcc00;
+            color: #000;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .card {
+            background-color: #fff;
+            color: #000;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            border: 5px solid #ff9800;
+        }
+
+        .target-word {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 4px dashed #ccc;
+            padding-bottom: 10px;
+            color: #d32f2f;
+        }
+
+        .forbidden-words {
+            list-style: none;
+            padding: 0;
+            font-size: 22px;
+            margin: 0;
+        }
+
+        .forbidden-words li { margin-bottom: 8px; color: #424242; font-weight: bold;}
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .btn-correct { background: linear-gradient(to bottom, #32cd32, #008000); }
+        .btn-fail { background: linear-gradient(to bottom, #ff4500, #b22222); }
+
+        .help-box {
+            background-color: rgba(0,0,0,0.6);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: left;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+        
+        .timer-text { font-size: 24px; color: #d32f2f; background: #fff; padding: 3px 12px; border-radius: 20px; border: 2px solid #d32f2f; }
+        .alert-text { color: #ffeb3b; font-weight: bold; margin-top: 10px; font-size: 20px;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- MAIN MENU -->
+    <div id="main-menu" class="screen active">
+        <img src="54418.jpg" class="menu-image" alt="শ্রীজীব">
+        <div class="title-box">
+            <h1>শ্রীজীব শক্তি খেলা 🎉</h1>
+            <p>সৃষ্টিকর্তা: বিষ্ণু গোস্বামী</p>
+            <p style="color:#000; margin-top: 5px;" id="total-cards-label">(মোট কার্ড: লোড হচ্ছে...)</p>
+        </div>
+        <button class="btn btn-mode" onclick="showSetup('timed')">⏱️ সময় ধরে খেলা (Timed)</button>
+        <button class="btn btn-mode" onclick="showSetup('normal')">🔄 সাধারণ খেলা (Turn-by-turn)</button>
+        <button class="btn btn-debug" onclick="showDebugSetup()">🛠️ ডিবাগ মোড (Card Range)</button>
+        <button class="btn btn-help" onclick="showScreen('help-screen')">📖 খেলার নিয়ম (Rules)</button>
+        <button class="btn btn-music" id="music-btn" onclick="toggleMusic()">🎵 ব্যাকগ্রাউন্ড মিউজিক: চালু</button>
+    </div>
+
+    <!-- HELP SCREEN -->
+    <div id="help-screen" class="screen">
+        <div class="help-box">
+            <h3 style="text-align: center; color: #ffeb3b;">খেলার নিয়মাবলী 🧠</h3>
+            <p>• কমপক্ষে ৪ জন মিলে দুটি দলে (ক ও খ) ভাগ হয়ে বসুন।</p>
+            <p>• এই খেলায় কোনো পাস করার অপশন নেই!</p>
+            <p>• <b>সাধারণ মোড:</b> সঠিক উত্তর দিলে পয়েন্ট পাবেন এবং পালা অপর দলের কাছে যাবে। ভুল উত্তর দিলে কেবল অপর দল ০.৫ পয়েন্ট পাবে কিন্তু আপনার দলের পালা <b>চলতেই থাকবে</b> (যতক্ষণ না সঠিক উত্তর দেন)!</p>
+            <p>• অফিসিয়াল ওয়েবসাইট: <a href="http://bishnu-goswami.github.io/" target="_blank" style="color: #00ffff;">bishnu-goswami.github.io</a></p>
+        </div>
+        <button class="btn" onclick="showScreen('main-menu')">⬅️ ফিরে যান</button>
+    </div>
+
+    <!-- SETUP SCREEN -->
+    <div id="setup-screen" class="screen">
+        <div class="setup-box">
+            <h2 style="text-align:center; margin-top:0;">খেলার সেটিংস ⚙️</h2>
+            <label>জয়ের লক্ষ্য (Winning Score):</label>
+            <input type="number" id="win-score" value="10" min="1" max="50">
+            
+            <div id="timer-setup">
+                <label>প্রতি পালার সময় (সেকেন্ডে):</label>
+                <input type="number" id="turn-time" value="30" min="10" max="120">
+            </div>
+        </div>
+        <button class="btn btn-mode" onclick="startNewGame(false)">খেলা শুরু! 🚀</button>
+        <button class="btn" onclick="showScreen('main-menu')">⬅️ ফিরে যান</button>
+    </div>
+
+    <!-- DEBUG SETUP SCREEN -->
+    <div id="debug-setup-screen" class="screen">
+        <div class="setup-box">
+            <h2 style="text-align:center; margin-top:0;">ডিবাগ কার্ড ফিল্টার 🛠️</h2>
+            <label>শুরুর কার্ড নম্বর (Min 1):</label>
+            <input type="number" id="debug-start" value="1" min="1">
+            <label>শেষ কার্ড নম্বর:</label>
+            <input type="number" id="debug-end" value="50" min="1">
+            <label>জয়ের লক্ষ্য (Winning Score):</label>
+            <input type="number" id="debug-win-score" value="10" min="1">
+        </div>
+        <button class="btn btn-debug" onclick="startNewGame(true)">ডিবাগে খেলুন 🎯</button>
+        <button class="btn" onclick="showScreen('main-menu')">⬅️ ফিরে যান</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen">
+        <div class="status-bar">
+            <div id="team-a-score" style="color:#1976d2;">ক: 0</div>
+            <div id="timer-display" class="timer-text">--</div>
+            <div id="team-b-score" style="color:#388e3c;">খ: 0</div>
+        </div>
+
+        <div class="info-banner" id="turn-banner">
+            দল ক বোঝাচ্ছে, দল খ নজর রাখছে!
+        </div>
+
+        <div class="card" id="current-card">
+            <div class="target-word" id="target-word">শব্দ</div>
+            <ul class="forbidden-words" id="forbidden-words"></ul>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-fail btn-small" onclick="handleFail()">❌ ভুল (-0.5 অপনেন্ট)</button>
+            <button class="btn btn-correct btn-small" onclick="handleCorrect()">✅ সঠিক (+1)</button>
+        </div>
+    </div>
+
+    <!-- TURN OVER SCREEN -->
+    <div id="turn-over-screen" class="screen">
+        <div class="title-box">
+            <h2 id="turn-over-title">পালা শেষ! 🔄</h2>
+            <p id="turn-summary" style="font-size:18px; margin-top:10px; color:#000;"></p>
+        </div>
+        <h3 class="alert-text">এবার ফোনটি অন্য দলকে দিন! 📱</h3>
+        <button class="btn btn-mode" onclick="nextTurnStart()">পরের পালা শুরু করুন 🚀</button>
+    </div>
+
+    <!-- GAME OVER SCREEN -->
+    <div id="game-over-screen" class="screen">
+        <div class="title-box">
+            <h1 id="winner-text">দল জিতেছে! 🏆</h1>
+            <h3 id="final-score-text" style="color:#000;"></h3>
+        </div>
+        <button class="btn" onclick="showScreen('main-menu')">🏠 মূল মেনু</button>
+    </div>
+
+</div>
+
+<script>
+    // --- Audio System: Default ON + Stark & Loud Sounds ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let musicInterval;
+    let isMusicPlaying = true; // Default ON
+    
+    const energeticScales = [
+        [261.63, 329.63, 392.00, 523.25], 
+        [220.00, 277.18, 329.63, 440.00], 
+        [293.66, 369.99, 440.00, 587.33]
+    ];
+
+    // Start background music automatically on first user interaction
+    window.addEventListener('click', () => {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }, { once: true });
+
+    // Initialize background music interval
+    function startDefaultMusic() {
+        if (!musicInterval) {
+            const chosenScale = energeticScales[Math.floor(Math.random() * energeticScales.length)];
+            musicInterval = setInterval(() => {
+                if (!isMusicPlaying) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.type = 'triangle';
+                osc.frequency.value = chosenScale[Math.floor(Math.random() * chosenScale.length)];
+                
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime); 
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            }, 250);
+        }
+    }
+    startDefaultMusic();
+
+    function toggleMusic() {
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const btn = document.getElementById('music-btn');
+        isMusicPlaying = !isMusicPlaying;
+        if (isMusicPlaying) {
+            btn.innerText = "🎵 ব্যাকগ্রাউন্ড মিউজিক: চালু";
+        } else {
+            btn.innerText = "🔇 ব্যাকগ্রাউন্ড মিউজিক: বন্ধ";
+        }
+    }
+
+    // Loud, Stark, Cheerful (Clap/Cheers imitation) & Dramatic Wrong Sound
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+
+        if (type === 'correct') {
+            // Loud celebratory fanfare / multiple tones simulating cheer
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(freq, now + (idx * 0.08));
+                
+                gain.gain.setValueAtTime(0.3, now + (idx * 0.08));
+                gain.gain.exponentialRampToValueAtTime(0.01, now + (idx * 0.08) + 0.3);
+                
+                osc.start(now + (idx * 0.08));
+                osc.stop(now + (idx * 0.08) + 0.3);
+            });
+        } else if (type === 'fail') {
+            // Dramatic, loud buzzer drop
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(50, now + 0.5);
+            
+            gain.gain.setValueAtTime(0.7, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+            
+            osc.start(now);
+            osc.stop(now + 0.5);
+        } else if (type === 'timeup') {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.setValueAtTime(880, now + 0.15);
+            
+            gain.gain.setValueAtTime(0.5, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+            
+            osc.start(now);
+            osc.stop(now + 0.5);
+        }
+    }
+
+    // --- Game Engine Variables ---
+    let gameMode = 'timed'; 
+    let targetScore = 10; 
+    let turnTime = 30; 
+    
+    let scoreA = 0;
+    let scoreB = 0;
+    let currentTeam = 'A';
+    let activeDeck = [];
+    let timer;
+    let timeLeft = 0;
+
+    window.onload = function() {
+        document.getElementById('total-cards-label').innerText = `(মোট কার্ড: ${tabooCards.length} টি)`;
+        document.getElementById('debug-end').value = tabooCards.length;
+    };
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function showSetup(mode) {
+        gameMode = mode;
+        document.getElementById('timer-setup').style.display = mode === 'timed' ? 'block' : 'none';
+        showScreen('setup-screen');
+    }
+
+    function showDebugSetup() {
+        gameMode = 'debug';
+        showScreen('debug-setup-screen');
+    }
+
+    function startNewGame(isDebug) {
+        scoreA = 0; scoreB = 0; currentTeam = 'A';
+        
+        if (isDebug) {
+            targetScore = parseInt(document.getElementById('debug-win-score').value) || 10;
+            let startIdx = parseInt(document.getElementById('debug-start').value) - 1;
+            let endIdx = parseInt(document.getElementById('debug-end').value);
+            startIdx = Math.max(0, startIdx);
+            endIdx = Math.min(tabooCards.length, endIdx);
+            activeDeck = tabooCards.slice(startIdx, endIdx).sort(() => Math.random() - 0.5);
+            if(activeDeck.length === 0) activeDeck = [...tabooCards];
+        } else {
+            targetScore = parseInt(document.getElementById('win-score').value) || 10;
+            turnTime = parseInt(document.getElementById('turn-time').value) || 30;
+            activeDeck = [...tabooCards].sort(() => Math.random() - 0.5);
+        }
+
+        startTurn();
+    }
+
+    function startTurn() {
+        updateUI();
+        loadNextCard();
+        showScreen('game-screen');
+
+        if (gameMode === 'timed') {
+            timeLeft = turnTime;
+            document.getElementById('timer-display').innerText = "⏳ " + timeLeft + "s";
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-display').innerText = "⏳ " + timeLeft + "s";
+                if (timeLeft <= 0) {
+                    endTimedTurn();
+                }
+            }, 1000);
+        } else {
+            document.getElementById('timer-display').innerText = "সাধারণ খেলা";
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('team-a-score').innerText = "ক: " + scoreA;
+        document.getElementById('team-b-score').innerText = "খ: " + scoreB;
+        
+        const banner = document.getElementById('turn-banner');
+        if (currentTeam === 'A') {
+            banner.innerText = "দল ক বোঝাচ্ছে, দল খ নজর রাখছে!";
+            banner.style.backgroundColor = "#ffeb3b"; 
+        } else {
+            banner.innerText = "দল খ বোঝাচ্ছে, দল ক নজর রাখছে!";
+            banner.style.backgroundColor = "#4fc3f7"; 
+        }
+    }
+
+    function loadNextCard() {
+        if (activeDeck.length === 0) activeDeck = [...tabooCards].sort(() => Math.random() - 0.5);
+        const card = activeDeck.pop();
+        document.getElementById('target-word').innerText = card.target;
+        
+        const ul = document.getElementById('forbidden-words');
+        ul.innerHTML = '';
+        card.forbidden.forEach(word => {
+            const li = document.createElement('li');
+            li.innerText = word;
+            ul.appendChild(li);
+        });
+    }
+
+    function handleCorrect() {
+        playSound('correct');
+        if (currentTeam === 'A') scoreA += 1; 
+        else scoreB += 1;
+
+        if (!checkAbsoluteWin()) {
+            if (gameMode === 'normal' || gameMode === 'debug') {
+                // In normal mode, ONLY a right guess passes the turn to opponent
+                endTurn("সঠিক উত্তর! পালা পরিবর্তন হচ্ছে 🔄"); 
+            } else {
+                loadNextCard(); // Timed mode keeps going within the timer
+            }
+        }
+    }
+
+    function handleFail() {
+        playSound('fail');
+        // Opponent gets +0.5 points
+        if (currentTeam === 'A') scoreB += 0.5; 
+        else scoreA += 0.5;
+        
+        if (!checkAbsoluteWin()) {
+            if (gameMode === 'normal' || gameMode === 'debug') {
+                // Wrong guess does NOT pass turn in normal mode; just loads next card for same team
+                loadNextCard(); 
+            } else {
+                loadNextCard(); // Timed mode keeps going
+            }
+        }
+    }
+
+    function checkAbsoluteWin() {
+        updateUI();
+        if (scoreA >= targetScore || scoreB >= targetScore) {
+            clearInterval(timer);
+            const winner = scoreA >= targetScore ? "দল ক" : "দল খ";
+            document.getElementById('winner-text').innerText = winner + " জিতেছে! 🏆";
+            document.getElementById('final-score-text').innerText = `চূড়ান্ত স্কোর - ক: ${scoreA} | খ: ${scoreB}`;
+            showScreen('game-over-screen');
+            return true;
+        }
+        return false;
+    }
+
+    function endTimedTurn() {
+        clearInterval(timer);
+        playSound('timeup');
+        document.getElementById('turn-over-title').innerText = "সময় শেষ! ⏰";
+        document.getElementById('turn-summary').innerHTML = 
+            `বর্তমান স্কোর:<br><b>দল ক: ${scoreA}</b> | <b>দল খ: ${scoreB}</b>`;
+        showScreen('turn-over-screen');
+    }
+
+    function endTurn(titleText) {
+        document.getElementById('turn-over-title').innerText = titleText;
+        document.getElementById('turn-summary').innerHTML = 
+            `বর্তমান স্কোর:<br><b>দল ক: ${scoreA}</b> | <b>দল খ: ${scoreB}</b>`;
+        showScreen('turn-over-screen');
+    }
+
+    function nextTurnStart() {
+        currentTeam = currentTeam === 'A' ? 'B' : 'A';
+        startTurn();
+    }
+
+    // =========================================================================
+    // --- 100% COMPLETE CARDS DATABASE (Extracted from all 3 PNG Texture Sheets) ---
+    // =========================================================================
+    const tabooCards = [
+        // Texture 0
+        { target: "সাইকেল", forbidden: ["দু-চাকা", "বেল", "প্যাডেল", "কন্যাশ্রী", "ক্রিং-ক্রিং"] },
+        { target: "আংটি", forbidden: ["আঙুল", "গ্রহ", "অলংকার", "ভাগ্য", "সোনার"] },
+        { target: "শরবত", forbidden: ["পানীয়", "মিষ্টি", "ফল", "জল", "তৃষ্ণা"] },
+        { target: "সংখ্যা", forbidden: ["ফোন", "পিন", "০, ১, ২...", "যোগ", "গুণ"] },
+        { target: "গয়না", forbidden: ["সোনা", "বিয়ে", "হার", "বালা", "চুড়ি"] },
+        { target: "ঘড়ি", forbidden: ["সময়", "কাঁটা", "তিন", "হিসেব", "(ব্র্যান্ড নাম)"] },
+        { target: "টিকটিকি", forbidden: ["টিক", "দেওয়াল", "লেজ", "সাদা", "সরীসৃপ"] },
+        { target: "দেনা", forbidden: ["পাওনা", "টাকা", "বাকি", "সুদ", "ঋণ"] },
+        { target: "মঙ্গলগ্রহ", forbidden: ["আকাশ", "মঙ্গল", "গ্রহ", "এলন মাস্ক", "লাল"] },
+        { target: "বাংলা", forbidden: ["মাতৃভাষা", "ভাষা", "বিদ্যাসাগর", "বর্ণপরিচয়", "ইংরাজি"] },
+        { target: "কুকুর", forbidden: ["লেজ", "চার", "দেশী", "রাস্তায়", "ঘেউ"] },
+        { target: "হিন্দি", forbidden: ["ভাষা", "রাষ্ট্র", "বাংলা", "ইংরাজি", "দিল্লি"] },
+        { target: "শিশু", forbidden: ["ছোট", "বাচ্চা", "কোলে", "নবীন", "মা"] },
+        { target: "চাদর", forbidden: ["আবরণ", "শীত", "ঠান্ডা", "গা", "কাপড়"] },
+        { target: "হাতি", forbidden: ["শুঁড়", "বড়", "দাঁত", "ভারী", "ওজন"] },
+        { target: "চা", forbidden: ["দার্জিলিং", "আসাম", "পাতা", "চুমুক", "পানীয়"] },
+        { target: "ভেড়া", forbidden: ["উল", "লোম", "পাল", "সাদা", "পশু"] },
+        { target: "চেন্নাই", forbidden: ["মাদ্রাজ", "তামিল নাড়ু", "দক্ষিণ", "রাজধানী", "ট্রেন"] },
+        { target: "শ্রীজীব", forbidden: ["তকা", "অবতার", "ছেলে", "অন্নপ্রাসন", "প্রতাষ"] },
+        { target: "ঘুড়ি", forbidden: ["সুতো", "লাটাই", "আকাশ", "মাঞ্জা", "উড়ে চলা"] },
+        { target: "সন্দেশ", forbidden: ["মিষ্টি", "নলেনগুড়", "পুজো", "রসগোল্লা", "পত্রিকা"] },
+        { target: "মুড়ি", forbidden: ["খাবার", "চানাচুর", "সাদা", "চাল", "মুড়কি"] },
+        { target: "কচ্ছপ", forbidden: ["খোল", "বছর", "সরীসৃপ", "বয়স", "মাংস"] },
+        { target: "কাপ", forbidden: ["পানীয়", "চা", "কফি", "মুখ", "কাঁচ"] },
+        { target: "রুটি", forbidden: ["বেলা", "আটা", "ময়দা", "মাখন", "তর্কা"] },
+        { target: "ফ্যান", forbidden: ["ব্লেড", "ঘোরা", "গরম", "ঠান্ডা", "ওপর"] },
+        { target: "সাদা", forbidden: ["কালো", "রঙ", "পবিত্র", "উল্টো", "চক"] },
+        { target: "চশমা", forbidden: ["চোখ", "ডাঁটি", "কাঁচ", "দৃষ্টি", "গ্লাস"] },
+        { target: "বালিশ", forbidden: ["বিছানা", "মাথা", "নরম", "আরাম", "কভার"] },
+        { target: "ল্যাংচা", forbidden: ["শক্তিগড়", "মিষ্টি", "বিখ্যাত", "হাইওয়ে", "লম্বা"] },
+        { target: "আগুন", forbidden: ["শিখা", "জ্বলন্ত", "গরম", "বন", "জল"] },
+        { target: "ঘুঘু", forbidden: ["পাখি", "ঘু", "শালিক", "চড়াই"] },
+        { target: "সাঁতার", forbidden: ["জল", "ভাসা", "ডুবে", "পুকুর", "নদী"] },
+        { target: "হিংসা", forbidden: ["ঈর্ষা", "আমার", "ওর", "লোভ", "চেষ্টা"] },
+        { target: "ডিম", forbidden: ["কুসুম", "সাদা", "হলদে", "মুরগি", "হাঁস"] },
+        { target: "রাগ", forbidden: ["খুশি", "গলা", "লাল", "বিরক্ত", "ক্ষেপে"] },
+        { target: "ছুঁচ", forbidden: ["সেলাই", "সুতো", "লম্বা", "মেটাল", "ফুটো"] },
+        { target: "খাতা", forbidden: ["লেখা", "পেন", "কাগজ", "দিস্তা", "স্কুল"] },
+        { target: "মারপিট", forbidden: ["ঢিসুম-ঢাপ", "ঘুসি", "লাথি", "মারা", "হার"] },
+        { target: "বস", forbidden: ["চাকুরী", "কর্তা", "ওপর", "ছাঁটাই", "মোটা"] },
+        { target: "গোয়েন্দা", forbidden: ["সত্য", "ফেলুদা", "শার্লক", "ব্যোমকেশ", "ধরা"] },
+        { target: "পেট্রোল", forbidden: ["ডিজেল", "তেল", "মোটরসাইকেল", "গাড়ি", "কেরোসিন"] },
+        { target: "হামা", forbidden: ["বাচ্চা", "চার", "হাঁটা", "পায়ে", "শেখা"] },
+        { target: "মোবাইল", forbidden: ["স্মার্টফোন", "কথা", "মেসেজ", "কানে", "হাত"] },
+        { target: "খিচুড়ী", forbidden: ["চাল", "ডাল", "পদ", "হলদে", "হাঁড়ি"] },
+        { target: "গরিব", forbidden: ["ধনী", "নেই", "দরিদ্র", "পয়সা", "BPL"] },
+        { target: "ঢিল", forbidden: ["পাটকেল", "ছোঁড়া", "জখম", "রাস্তা", "চোট"] },
+        { target: "শ্রাদ্ধ", forbidden: ["মরা", "দাহ", "কবর", "চলে", "বুড়ো"] },
+        { target: "টাকা", forbidden: ["পয়সা", "ব্যাঙ্ক", "চাকুরী", "ব্যবসা", "বেলা"] },
+        { target: "মেট্রো", forbidden: ["ট্রেন", "রেল", "কলকাতা", "দরজা", "টোকেন"] },
+        { target: "ডাল", forbidden: ["চাল", "(বিশেষ ধরন)", "সেদ্ধ", "ভাত", "বাটি"] },
+        { target: "তিন", forbidden: ["এক", "দুই", "নয়(সংখ্যা)", "চার", "সংখ্যা"] },
+        { target: "টুপি", forbidden: ["মাথা", "রোদ", "ঢাকা", "ওপর", "চুল"] },
+        { target: "অতীত", forbidden: ["ভবিষ্যৎ", "বর্তমান", "আগে", "প্রাচীন", "পুরাতন"] },
+        { target: "চেয়ার", forbidden: ["টেবিল", "চার", "বসা", "কাঠ", "অফিস"] },
+        { target: "বরফ", forbidden: ["ঠান্ডা", "ফ্রিজ", "পড়া", "সাদা", "তুলো"] },
+        { target: "বাঘ", forbidden: ["হালুম", "সুন্দরবন", "ডোরাকাটা", "সাফারি", "জন্তু"] },
+        { target: "চপ", forbidden: ["শিল্প", "ভাজা", "পিয়ারা", "তেল", "কাটলেট"] },
+        { target: "চাকা", forbidden: ["আগুন", "গোল", "ঘর্ষণ", "গাড়ি", "আবিষ্কার"] },
+        { target: "গান", forbidden: ["গলা", "নাচ", "সঙ্গীত", "গাওয়া", "সুর"] },
+        { target: "জল", forbidden: ["জীবন", "পানীয়", "H2O", "গ্লাস", "পুকুর/সমুদ্র"] },
+        { target: "মাছ", forbidden: ["জল", "ছিপ", "বাঙালি", "বেড়াল", "জাল"] },
+        { target: "খুন্তি", forbidden: ["হাতা", "ভাজা", "বাসন", "স্টিল", "মার"] },
+        { target: "বাবা", forbidden: ["মা", "দাদু", "ভাই", "ছেলে", "শালা"] },
+        { target: "আম", forbidden: ["আ", "ফল", "(জাত)", "আঁটি", "জাম"] },
+        { target: "চাবি", forbidden: ["খোলা", "তালা", "দরজা", "রিং", "কাঠি"] },
+        { target: "মন্দির", forbidden: ["দেবতা", "হিন্দু", "পুজো", "প্রসাদ", "ঠাকুর"] },
+        { target: "পতাকা", forbidden: ["স্বাধীনতা", "দেশ", "চক্র", "তিন", "১৯৪৭ আগস্ট"] },
+        { target: "রবীন্দ্রনাথ", forbidden: ["নোবেল", "শান্তিনিকেতন", "কবি", "দাড়ি", "১৯৪১"] },
+        { target: "দুল", forbidden: ["কান", "গয়না", "সোনা", "ফুটো", "মেয়ে"] },
+        { target: "আকাশ", forbidden: ["নীল", "ওপরে", "মেঘ", "পাখি", "ওড়া"] },
+        { target: "লুডো", forbidden: ["খেলা", "ছক্কা", "ঘুঁটি", "কাটা", "বোর্ড"] },
+
+        // Texture 1
+        { target: "পায়েস", forbidden: ["চাল", "মিষ্টি", "জন্মদিন", "চিনি", "ভোগ"] },
+        { target: "কল", forbidden: ["জল", "ঘোরানো", "পানীয়", "তরল", "ট্যাঙ্ক"] },
+        { target: "নেপাল", forbidden: ["শেরপা", "এভারেস্ট", "দেশ", "উত্তর", "পাহাড়"] },
+        { target: "উইকেট", forbidden: ["ক্রিকেট", "আউট", "তিন", "বেল", "স্ট্যাম্প"] },
+        { target: "ব্ল্যাকবোর্ড", forbidden: ["কালো", "চক", "স্কুল", "সাদা", "শিক্ষক"] },
+        { target: "নদী", forbidden: ["জল", "নৌকা", "সমুদ্র", "পার", "মাঝি"] },
+        { target: "খরম", forbidden: ["জুতো", "কাঠ", "পা", "পুরাতন", "চটি"] },
+        { target: "শাড়ি", forbidden: ["কাপড়", "কুঁচি", "ধরণ(বেনারসী..)", "সায়া", "মহিলা"] },
+        { target: "ঝিনুক", forbidden: ["সমুদ্র", "শিশু", "বাচ্চা", "দুধ", "শামুক"] },
+        { target: "সৌরভ", forbidden: ["ক্রিকেট/দাদা", "দাদা", "দাদাগিরি", "গাঙ্গুলী", "বেহালা"] },
+        { target: "বিয়ে", forbidden: ["স্বামী", "স্ত্রী", "মিলন", "বাড়ি", "ভোজ"] },
+        { target: "বাছুর", forbidden: ["ছোট", "গরু", "দুধ", "পশু", "এঁড়ে"] },
+        { target: "মুম্বাই", forbidden: ["মহারাষ্ট্র", "বোম্বে", "পশ্চিম", "চেন্নাই", "দিল্লি"] },
+        { target: "সিমেন্ট", forbidden: ["বাড়ি", "বালি", "ইট", "ঢালাই", "রড"] },
+        { target: "ট্রাম", forbidden: ["ট্রেন", "শহর", "কলকাতা", "কামরা", "লাইন"] },
+        { target: "ঝগড়া", forbidden: ["চেঁচামেচি", "গলা", "মনোমালিন্য", "অশান্তি", "মেজাজ"] },
+        { target: "কালী", forbidden: ["পটকা", "দুর্গা", "শিব", "কালো", "(অন্য নাম)"] },
+        { target: "বাস", forbidden: ["চালানো", "কন্ডাক্টর", "টিকিট", "বড়", "ড্রাইভার"] },
+        { target: "তাল", forbidden: ["নারকেল", "গাছ", "শাঁস", "একপায়ে", "লম্বা"] },
+        { target: "গণতন্ত্র", forbidden: ["ভারত", "ভোট", "সব", "রাজা", "১৯৫০"] },
+        { target: "লাফদড়ি", forbidden: ["দড়ি", "লাফ", "লাফানো", "পা", "খেলা"] },
+        { target: "গুনগুন", forbidden: ["গান", "আস্তে", "শব্দ", "সুর", "ভাজা"] },
+        { target: "হাই", forbidden: ["মুখ", "হা", "ঘুম", "চোখ", "তুলে"] },
+        { target: "তোতলা", forbidden: ["কথা", "জড়িয়ে", "আসতা", "আটকে", "সা শা"] },
+        { target: "গামছা", forbidden: ["চাল", "জল", "মোছা", "রঙ", "পাতলা"] },
+        { target: "বট", forbidden: ["গাছ", "ঝুরি", "প্রাচীন", "ছায়া", "ছড়ানো"] },
+        { target: "নিম", forbidden: ["দাতন", "তেতো", "ছায়া", "পাতা", "স্বাদ"] },
+        { target: "বেলুন", forbidden: ["গ্যাস", "শিশু", "বাচ্চা", "ফোলে", "জন্মদিন"] },
+        { target: "বন্দুক", forbidden: ["গুলি", "দুম", "পুলিশ", "গুন্ডা", "নল"] },
+        { target: "কনস্টেবল", forbidden: ["পুলিশ", "বন্দুক", "নতুন", "আইন", "লাঠি"] },
+        { target: "মোষ", forbidden: ["গরু", "কালো", "দুধ", "বড়", "বিশাল"] },
+        { target: "ঘটক", forbidden: ["বিয়ে", "স্বামী", "দালালি", "ঠিক", "বউ"] },
+        { target: "মোটা", forbidden: ["রোগা", "ভুঁড়ি", "ওজন", "পেট", "ছেলে"] },
+        { target: "দুর্গা", forbidden: ["দশ", "দেবতা", "দেবী", "মহিষাসুর", "পুজো"] },
+        { target: "টিনটিন", forbidden: ["কুট্টুস", "হাডক", "কাসাফিয়োর", "চাঁদে", "হার্জ"] },
+        { target: "বোমা", forbidden: ["ফাটে", "দুম", "সলতে", "বাজি", "শব্দ"] },
+        { target: "মিছিল", forbidden: ["লোক", "বাহিনী", "রাস্তা", "স্লোগান", "রাজনীতি"] },
+        { target: "গোল্লা", forbidden: ["শূন্য", "পরীক্ষা", "অঙ্ক", "কিছুই", "লবডঙ্কা"] },
+        { target: "দেশলাই", forbidden: ["সিগারেট", "আগুন", "ঘষা", "কাঠি", "রান্না"] },
+        { target: "যুধিষ্ঠির", forbidden: ["সত্য", "পাণ্ডব", "বড়", "ভাই", "মহাভারত"] },
+        { target: "বিদ্যাসাগর", forbidden: ["বর্ণপরিচয়", "সাগর", "বাংলা", "ঈশ্বরচন্দ্র", "বিদ্যা"] },
+        { target: "দ্রোণাচার্য", forbidden: ["মহাভারত", "গুরু", "আঙ্গুল", "কৌরব", "পাণ্ডব"] },
+        { target: "বিবেকানন্দ", forbidden: ["আমেরিকা", "ভাই", "ভাষণ", "রামকৃষ্ণ", "সাধু"] },
+        { target: "কৈলাস", forbidden: ["শিব", "তীর্থ", "পাহাড়", "বরফ", "হিন্দু"] },
+        { target: "ধনুক", forbidden: ["তির", "বান", "জ্যা", "অস্ত্র", "টঙ্কার"] },
+        { target: "শাহরুখ খান", forbidden: ["হিন্দি", "চলচ্চিত্র", "নায়ক", "কলকাতা", "বলিউড"] },
+        { target: "মস্কো", forbidden: ["রাশিয়া", "রাজধানী", "দেশ", "আমেরিকা", "পুতিন"] },
+        { target: "নেতাজি", forbidden: ["সুভাষ", "জাপান", "স্বাধীনতা", "রক্ত", "বোস"] },
+        { target: "জটায়ু", forbidden: ["পাখি", "লালমোহন", "ফেলুদা", "রামায়ণ", "ডানা"] },
+        { target: "রাবণ", forbidden: ["দশ", "আনন", "সীতা", "লঙ্কা", "রাম"] },
+        { target: "দ্রৌপদী", forbidden: ["স্ত্রী", "অর্জুন", "পাণ্ডব", "বস্ত্রহরণ"] },
+        { target: "অমৃতসর", forbidden: ["শিখ", "সোনার", "মন্দির", "পাঞ্জাব", "খাবার"] },
+        { target: "উত্তমকুমার", forbidden: ["সুচিত্রা", "নায়ক", "চলচ্চিত্র", "বাংলা", "জুটি"] },
+        { target: "সোভিয়েত ইউনিয়ন", forbidden: ["রাশিয়া", "আমেরিকা", "কমিউনিস্ট", "আগে", "কাস্তে"] },
+        { target: "সুচিত্রা", forbidden: ["উত্তমকুমার", "নায়িকা", "চলচ্চিত্র", "বাংলা", "জুটি"] },
+        { target: "কোহলি", forbidden: ["ক্রিকেট", "ভারত", "শচীন", "তেন্ডুলকর", "ক্যাপ্টেন"] },
+        { target: "লক্ষণ", forbidden: ["রাম", "ভাই", "রামায়ণ", "বনবাস", "নাক"] },
+        { target: "বর্ধমান", forbidden: ["জেলা", "সীতাভোগ", "মিহিদানা", "কার্জন", "রাজবাড়ি"] },
+        { target: "সীতা", forbidden: ["রাম", "স্ত্রী", "রামায়ণ", "জনক", "হরণ"] },
+        { target: "ঢাকা", forbidden: ["বাংলাদেশ", "খাবার", "রাজধানী", "পূর্ব", "খোলা"] },
+        { target: "অমিতাভ বচ্চন", forbidden: ["হিন্দি", "চলচ্চিত্র", "নায়ক", "ক্রোড়পতি", "বলিউড"] },
+        { target: "প্যারিস", forbidden: ["ফ্রান্স", "রাজধানী", "বেড়ানো", "আইফেল", "ফরাসী"] },
+        { target: "মাদ্রিদ", forbidden: ["স্পেন", "রাজধানী", "ইউরোপ", "ফুটবল", "রিয়াল"] },
+
+        // Texture 2
+        { target: "পাকস্থলী", forbidden: ["পেট", "হজম", "পরিপাক", "ভুঁড়ি", "তন্ত্র"] },
+        { target: "চামড়া", forbidden: ["গোরু", "জুতো", "স্পর্শ", "বাইরে", "লোম"] },
+        { target: "মস্তিষ্ক", forbidden: ["মাথা", "চিন্তা", "ওপরে", "বুদ্ধি", "চুল"] },
+        { target: "কান", forbidden: ["শোনা", "সোনা", "শ্রবণ", "দুটো", "শব্দ"] },
+        { target: "বিরিয়ানি", forbidden: ["মাংস", "পছন্দের", "ডিম", "চাপ", "তেল"] },
+        { target: "ইলিশ", forbidden: ["মাছ", "গঙ্গা", "পদ্মা", "নদী", "হিলসা"] },
+        { target: "মড়াই", forbidden: ["ধান", "খড়", "রাখা", "গ্রাম", "চাষ"] },
+        { target: "কূয়ো", forbidden: ["জল", "বালতি", "তোলা", "গভীর", "খোলা"] },
+        { target: "যকৃত", forbidden: ["সুরা", "পেট", "পাকস্থলী", "সিরহসিস", "বড়"] },
+        { target: "ফুসফুস", forbidden: ["বাতাস", "নিশ্বাস", "বুক", "হৃদয়", "অঙ্গ"] },
+        { target: "বগল", forbidden: ["হাত", "তোলা", "চুল", "গন্ধ", "কিসমিস"] },
+        { target: "মঙ্গলবার", forbidden: ["সোম", "বুধ", "দ্বিতীয়", "গ্রহ", "শুক্র"] },
+        { target: "বোঁদে", forbidden: ["মিষ্টি", "লাল", "গোল্লা", "রঙ", "সোনালী"] },
+        { target: "কাকা", forbidden: ["ভাইপো", "বাবা", "ভাই", "কাকিমা", "কাক"] },
+        { target: "বমি", forbidden: ["ওয়াক", "মুখ", "উল্টে", "খাবার", "বাজে"] },
+        { target: "নস্যি", forbidden: ["নাক", "নেশা", "গুঁড়ো", "কৌট", "তামাক"] },
+        { target: "ডাক্তার", forbidden: ["কসাই", "ওষুধ", "স্টেথোস্কোপ", "ইঞ্জেকশন", "ক্যাপ্টেন"] },
+        { target: "আলজিভ", forbidden: ["মুখ", "জিভ", "পেছনে", "কথা", "ক্ষুদ্র"] },
+        { target: "কিসমিস", forbidden: ["পায়েস", "বাদাম", "মিষ্টি", "ফল", "ডাল"] },
+        { target: "রবিবার", forbidden: ["ছুটি", "সপ্তাহ", "শনি", "সোম", "(সংখ্যা)"] },
+        { target: "মোগলাই", forbidden: ["ডিম", "মোগল", "রুটি", "ভাজা", "পরোটা"] },
+        { target: "ভাগ্নে", forbidden: ["মামা", "ছেলে", "একরকম", "বোন", "বীরভূম"] },
+        { target: "শালগ্রাম", forbidden: ["শিলা", "পুজো", "শামুক", "পবিত্র", "হিন্দু"] },
+        { target: "সুপারি", forbidden: ["পান", "গাছ", "শক্ত", "ফল", "মশলা"] }
+    ];
+</script>
+
+</body>
+</html>
